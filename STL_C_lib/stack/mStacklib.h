@@ -1,89 +1,94 @@
-#ifndef stackStandardLib
+#ifndef mStacklib
 
 #include <stdlib.h>
 #include <limits.h>
 
 //<-----------STACK NODES----------->
 
-//Node for Integer Stack
-struct MinMaxStackInt{
-    int data;
-    struct MinMaxStackInt* next;
-    int min;
-    int max;
+
+//Node for MinMaxStack
+struct mstack{
+    void* data;
+    struct mstack* next;
+    void* min;
+    void* max;
     int length;
+    int datatype;
 };
-typedef struct MinMaxStackInt MinMaxStackInt;
+typedef struct mstack mstack;
 
-
-//Node for Character Stack
-struct MinMaxStackChar{
-    char data;
-    struct MinMaxStackChar* next;
-    char min;
-    char max;
-    int length;
-};
-typedef struct MinMaxStackChar MinMaxStackChar;
-
-
-//Node for Float Stack
-struct MinMaxStackFloat{
-    float data;
-    struct MinMaxStackFloat* next;
-    float min;
-    float max;
-    int length;
-};
-typedef struct MinMaxStackFloat MinMaxStackFloat;
 
 //<--------------------------------->
+
+//<--------DATATYPE CONSTANTS--------->
+// 1-int
+// 2-char
+// 3-float
+// XXX4-stringXXXX
+
+int dataIntMin=INT_MIN;
+char dataCharMin=CHAR_MIN;
+float dataFloatMin=INT_MIN;
+//XXXchar* dataStringMax=CHAR_MINXXX;
+
+int dataIntMax=INT_MAX;
+char dataCharMax=CHAR_MAX;
+float dataFloatMax=INT_MAX;
+//XXXchar* dataStringMax=CHAR_MAXXXX;
+
+//<----------------------------------->
 
 
 //<------------------CONSTRUCTION OF STACK------------------->
 
 
-//Function to construct Integer Stack 
-MinMaxStackInt* constructIntMStack(){
-    MinMaxStackInt* head=(MinMaxStackInt*)malloc(sizeof(MinMaxStackInt));
-    head->data=-1;
-    head->min=INT_MAX;
-    head->max=INT_MIN;
+//Function to construct Stack 
+mstack* constructMStack(int datatype){
+
+    if(datatype==4){
+    	printf("ERROR: String cant be used in MIN-MAX Stack\n");
+	exit(0);
+    }
+    if(datatype>4){
+    	printf("ERROR: Invalid data type\n");
+	exit(0);
+    }
+    mstack* head=(mstack*)malloc(sizeof(mstack));
+    head->datatype=datatype;
+
+    //intialization according to datatypes
+    if(datatype==1){
+    	head->data=(void*)&dataInt;
+	head->min=(void*)&dataIntMax;
+        head->max=(void*)&dataIntMin;
+    }else if(datatype==2){
+	head->data=(void*)&dataChar;
+        head->min=(void*)&dataCharMax;
+        head->max=(void*)&dataCharMin;
+    }else if(datatype==3){
+	head->data=(void*)&dataFloat;
+	head->min=(void*)&dataFloatMax;
+        head->max=(void*)&dataFloatMin;
+    }
+    //else if(datatype==4){
+    //	head->data=(void*)&dataString;
+    //	head->min=(void*)&dataStringMax;
+    //	head->max=(void*)&dataStringMin;
+    //}
+
     head->length=-1;
     head->next=NULL;
 }
 
 
-//Function to construct Character Stack 
-MinMaxStackChar* constructCharMStack(){
-    MinMaxStackChar* head=(MinMaxStackChar*)malloc(sizeof(MinMaxStackChar)); 
-    head->data='\0';
-    head->min=CHAR_MAX;
-    head->max=CHAR_MIN;
-    head->length=-1;
-    head->next=NULL;
-}
-
-
-//Function to construct Float Stack 
-MinMaxStackFloat* constructFloatMStack(){
-    MinMaxStackFloat* head=(MinMaxStackFloat*)malloc(sizeof(MinMaxStackFloat));
-    head->min=1000.000;
-    head->max=-1000.000;
-    head->data=-1;
-    head->length=-1;
-    head->next=NULL;
-}
-
-
-//<---------------------------------------------------------->
+//<-------------------------------------------------------->
 
 
 //<--------------------PUSH IN THE STACK------------------------>
 
 
-//Function to push into Integer Stack
-void pushInIntMStack(MinMaxStackInt* head,int val){
+//Function to push into Stack
+void pushMStack(mstack* head,void* val){
 
     //if stack is empty
     if(head->length==-1){
@@ -95,16 +100,54 @@ void pushInIntMStack(MinMaxStackInt* head,int val){
     }
 
     //Intializing memory for stack element
-    MinMaxStackInt* newNode=(MinMaxStackInt*)malloc(sizeof(MinMaxStackInt));
+    mstack* newNode=(mstack*)malloc(sizeof(mstack));
     
     //checking for min and max
-    int min,max;
-    if(head->min>val){
+    int valInt,headIntMin,headIntMax;
+    char valChar,headCharMin,headCharMax;
+    float valFloat,headFloatMin,headFloatMax;
+    int flagMin=0,flagMax=0;
+    if(head->datatype==1){
+    	valInt=*(int*)val;
+	headIntMin=*(int*)head->min;
+	headIntMax=*(int*)head->max;
+	if(headIntMin>valInt){
+	    flagMin=1;
+	}
+	if(headIntMax<valInt){
+	    flagMax=1;
+	}
+    }else if(head->datatype==2){
+    	valChar=*(char*)val;
+	headCharMin=*(char*)head->min;
+	headCharMax=*(char*)head->max;
+
+	if(headCharMin>valChar){
+	    flagMin=1;
+	}
+	if(headCharMax<valChar){
+	    flagMax=1;
+	}
+    }else if(head->datatype==2){
+    	valFloat=*(float*)val;
+	headFloatMin=*(float*)head->min;
+	headFloatMax=*(float*)head->max;
+	if(headFloatMin>valFloat){
+	    flagMin=1;
+	}
+	if(headFloatMax<valFloat){
+	    flagMax=1;
+	}
+    }
+
+    void* min;
+    void* max;
+    if(flagMin){
     	min=val;
     }else{
     	min=head->min;
     }
-    if(head->max<val){
+    if(flagMax){
     	max=val;
     }else{
     	max=head->max;
@@ -123,93 +166,6 @@ void pushInIntMStack(MinMaxStackInt* head,int val){
     //increase length of stack
     head->length+=1;
 }
-
-
-//Function to push into Character Stack
-void pushInCharMStack(MinMaxStackChar* head,char val){
-    
-    //if stack is empty
-    if(head->length==-1){
-    	head->data=val;
-	head->min=val;
-	head->max=val;
-	head->length=1;
-	return;
-    }
-
-    //Intializing memory for stack element
-    MinMaxStackChar* newNode=(MinMaxStackChar*)malloc(sizeof(MinMaxStackChar));
-    
-    //checking for min and max
-    char min,max;
-    if(head->min>val){
-    	min=val;
-    }else{
-    	min=head->min;
-    }
-    if(head->max<val){
-    	max=val;
-    }else{
-    	max=head->max;
-    }
-
-    //assigning at the top 
-    newNode->data=head->data;
-    newNode->min=head->min;
-    newNode->max=head->max;
-    newNode->next=head->next;
-    head->next=newNode;
-    head->data=val;
-    head->min=min;
-    head->max=max;
-
-    //increase length of stack
-    head->length+=1;
-}
-
-
-//Function to push into Float Stack
-void pushInFloatMStack(MinMaxStackFloat* head,float val){
-    
-    //if stack is empty
-    if(head->length==-1){
-    	head->data=val;
-	head->min=val;
-	head->max=val;
-	head->length=1;
-	return;
-    }
-
-    //Intializing memory for stack element
-    MinMaxStackFloat* newNode=(MinMaxStackFloat*)malloc(sizeof(MinMaxStackFloat));
-    
-    //checking for min and max
-    float min,max;
-    if(head->min>val){
-    	min=val;
-    }else{
-    	min=head->min;
-    }
-    if(head->max<val){
-    	max=val;
-    }else{
-    	max=head->max;
-    }
-
-    //assigning at the top 
-    newNode->data=head->data;
-    newNode->min=head->min;
-    newNode->max=head->max;
-    newNode->next=head->next;
-    head->next=newNode;
-    head->data=val;
-    head->min=min;
-    head->max=max;
-
-    //increase length of stack
-    head->length+=1;
-}
-
 
 
 //<-------------------------------------------------------------------->
@@ -219,8 +175,8 @@ void pushInFloatMStack(MinMaxStackFloat* head,float val){
 
 
 
-//Function to pop from Integer Stack
-void popFromIntMStack(MinMaxStackInt* head){
+//Function to pop from Stack
+void popMStack(mstack* head){
     
     //if stack is empty
     if(head->length==-1){
@@ -230,9 +186,24 @@ void popFromIntMStack(MinMaxStackInt* head){
 
     //if stack has only one element
     if(head->next==NULL){
-    	head->data=-1;
-	head->max=INT_MIN;
-	head->min=INT_MAX;
+    	if(head->datatype==1){
+    	    head->data=(void*)&dataInt;
+	    head->min=(void*)&dataIntMax;
+	    head->max=(void*)&dataIntMin;
+    	}else if(head->datatype==2){
+	    head->data=(void*)&dataChar;
+            head->min=(void*)&dataCharMax;
+            head->max=(void*)&dataCharMin;
+    	}else if(head->datatype==3){
+	    head->data=(void*)&dataFloat;
+	    head->min=(void*)&dataFloatMax;
+            head->max=(void*)&dataFloatMin;
+    	}
+	//else if(datatype==4){
+	//    head->data=(void*)&dataString;
+	//    head->min=(void*)&dataStringMax;
+	//    head->max=(void*)&dataStringMin;
+    	//}
 	head->length=-1;
 	return;
     }
@@ -241,75 +212,7 @@ void popFromIntMStack(MinMaxStackInt* head){
     head->data=head->next->data;
     head->max=head->next->max;
     head->min=head->next->min;
-    MinMaxStackInt* todelete=head->next;
-    head->next=head->next->next;
-
-    //free the unusable memory
-    free(todelete);
-
-    //decrease length of stack
-    head->length-=1;
-        
-}
-
-
-//Function to pop from Character Stack
-void popFromCharMStack(MinMaxStackChar* head){
-    
-    //if stack is empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	return;
-    }
-
-    //if stack has only one element
-    if(head->next==NULL){
-    	head->data=-1;
-	head->max=CHAR_MIN;
-	head->min=CHAR_MAX;
-	head->length=-1;
-	return;
-    }
-
-    //poping the element at top
-    head->data=head->next->data;
-    head->max=head->next->max;
-    head->min=head->next->min;
-    MinMaxStackChar* todelete=head->next;
-    head->next=head->next->next;
-
-    //free the unusable memory
-    free(todelete);
-
-    //decrease length of stack
-    head->length-=1;
-        
-}
-
-
-//Function to pop from Float Stack
-void popFromFloatMStack(MinMaxStackFloat* head){
-    
-    //if stack is empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	return;
-    }
-
-    //if stack has only one element
-    if(head->next==NULL){
-    	head->data=-1;
-	head->max=100000.000;
-	head->min=-100000.000;
-	head->length=-1;
-	return;
-    }
-
-    //poping the element at top
-    head->data=head->next->data;
-    head->max=head->next->max;
-    head->min=head->next->min;
-    MinMaxStackFloat* todelete=head->next;
+    mstack* todelete=head->next;
     head->next=head->next->next;
 
     //free the unusable memory
@@ -327,37 +230,8 @@ void popFromFloatMStack(MinMaxStackFloat* head){
 //<-------------------TOP OF STACK------------------------->
 
 
-//Function to get top element of Integer Stack
-int topOfIntMStack(MinMaxStackInt* head){
-
-    //if stack at empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	exit(1);
-    }
-
-    //return top element of stack
-    return head->data;
-
-}
-
-
-//Function to get top element of Character Stack
-char topOfCharMStack(MinMaxStackChar* head){
-
-    //if stack at empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	exit(1);
-    }
-
-    //return top element of stack
-    return head->data;
-
-}
-
-//Function to get top element of Float Stack
-float topOfFloatMStack(MinMaxStackFloat* head){
+//Function to get top element of Stack
+void* topMStack(mstack* head){
 
     //if stack at empty
     if(head->length==-1){
@@ -377,36 +251,7 @@ float topOfFloatMStack(MinMaxStackFloat* head){
 //<----------------------MIN IN STACK----------------------->
 
 //Function to get min element of Integer Stack
-int minOfIntMStack(MinMaxStackInt* head){
-
-    //if stack at empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	exit(1);
-    }
-
-    //return top element of stack
-    return head->min;
-
-}
-
-
-//Function to get top element of Character Stack
-char minOfCharMStack(MinMaxStackChar* head){
-
-    //if stack at empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	exit(1);
-    }
-
-    //return top element of stack
-    return head->min;
-
-}
-
-//Function to get top element of Float Stack
-float minOfFloatMStack(MinMaxStackFloat* head){
+void* minMStack(mstack* head){
 
     //if stack at empty
     if(head->length==-1){
@@ -427,37 +272,8 @@ float minOfFloatMStack(MinMaxStackFloat* head){
 
 
 
-//Function to get top element of Integer Stack
-int maxOfIntMStack(MinMaxStackInt* head){
-
-    //if stack at empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	exit(1);
-    }
-
-    //return top element of stack
-    return head->max;
-
-}
-
-
-//Function to get top element of Character Stack
-char maxOfCharMStack(MinMaxStackChar* head){
-
-    //if stack at empty
-    if(head->length==-1){
-    	printf("ERROR: Stack is Empty\n");
-	exit(1);
-    }
-
-    //return top element of stack
-    return head->max;
-
-}
-
-//Function to get top element of Float Stack
-float maxOfFloatMStack(MinMaxStackFloat* head){
+//Function to get top element of Stack
+void* maxMStack(mstack* head){
 
     //if stack at empty
     if(head->length==-1){
@@ -478,19 +294,7 @@ float maxOfFloatMStack(MinMaxStackFloat* head){
 
 
 //Function which returns if stack is empty or not
-int intMStackIsEmpty(MinMaxStackInt* head){
-    return head->length>0?0:1;
-}
-
-
-//Function which returns if stack is empty or not
-int charMStackIsEmpty(MinMaxStackChar* head){
-    return head->length>0?0:1;
-}
-
-
-//Function which returns if stack is empty or not
-int floatMStackIsEmpty(MinMaxStackFloat* head){
+int MStackIsEmpty(mstack* head){
     return head->length>0?0:1;
 }
 
@@ -501,30 +305,8 @@ int floatMStackIsEmpty(MinMaxStackFloat* head){
 //<------------------SIZE OF STACK------------------------>
 
 
-//Function to return size of Integer stack
-int sizeOfIntMStack(MinMaxStackInt* head){
-     
-     //if stack is empty
-     if(head->length<=0){
-     	return 0;
-     }
-     return head->length;
-}
-
-
-//Function to return size of Character stack
-int sizeOfCharMStack(MinMaxStackChar* head){
-     
-     //if stack is empty
-     if(head->length<=0){
-     	return 0;
-     }
-     return head->length;
-}
-
-
-//Function to return size of Float stack
-int sizeOfFloatMStack(MinMaxStackFloat* head){
+//Function to return size of stack
+int sizeMStack(mstack* head){
      
      //if stack is empty
      if(head->length<=0){
@@ -535,5 +317,5 @@ int sizeOfFloatMStack(MinMaxStackFloat* head){
 
 
 //<--------------------------------------------------------->
-#define stackStandardLib
+#define mStacklib
 #endif
