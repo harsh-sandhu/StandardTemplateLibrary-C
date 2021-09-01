@@ -1,5 +1,6 @@
 #ifndef standardQueue
 #include <stdlib.h>
+#include "../DataTypes.h"
 
 //<-----STRUCTURE OF QUEUE NODE------>
 
@@ -13,19 +14,6 @@ struct queue{
 typedef struct queue queue;
 
 //<---------------------------------->
-
-//<--------DATATYPE CONSTANTS--------->
-// 1-int
-// 2-char
-// 3-float
-// 4-string
-
-int dataInt=-1;
-char dataChar='\0';
-float dataFloat=-1;
-char* dataString="";
-
-//<----------------------------------->
 
 
 //<------------CONSTRUCT THE QUEUE------------>

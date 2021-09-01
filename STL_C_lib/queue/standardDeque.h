@@ -1,5 +1,6 @@
 #ifndef standardDeque
 #include <stdlib.h>
+#include "../DataTypes.h"
 
 //<------NODE OF DEQUE------->
 //Doubly linked list implementation
@@ -12,20 +13,6 @@ struct deque{
     int datatype;
 };
 typedef struct deque deque;
-
-//<------CONSATANTS OF DATATYPES------>
-
-// int-1
-// char-2
-// float-3
-// string-4
-
-int dataInt=-1;
-char dataChar='\0';
-float dataFloat=-1;
-char* dataString="";
-
-//<------------------------------------>
 
 
 //<----------CONSTRUCTION OF DEQUE------------->
