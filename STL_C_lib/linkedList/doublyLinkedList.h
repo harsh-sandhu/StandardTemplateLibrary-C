@@ -1,65 +1,43 @@
-#ifndef linkedListLib
-
-//required in-built headers
+#ifndef doublyLinkedList
 #include <stdlib.h>
 #include "../DataTypes.h"
 
+// NODE FOR DOUBLY-LINKED-LIST
 
-//<-----------------NODE------------------>
-
-//Node
-struct linkedlist{
+struct dlinkedlist{
     void* data;
+    struct dlinkedlist* next;
+    struct dlinkedlist* prev;
+    struct dlinkedlist* end;
     int length;
-    struct linkedlist *next;
-    struct linkedlist *end;
-    int datatype;
+    short datatype;
 };
-typedef struct linkedlist linkedlist;
+typedef struct dlinkedlist dlinkedlist;
 
 
-//<-------------------------------------------->
+// construct the Doubly-linked-list
 
-
-//<------------------CONSTRUCTION------------------>
-
-//Function for Construction of LinkedList
-
-
-//returns a pointer - linkedlist*
-linkedlist* constructLinkedList(int datatype){
-
-    linkedlist* head=(linkedlist*)malloc(sizeof(linkedlist));
-
-    head->next=NULL;
-    head->end=NULL;
+dlinkedlist* constructDLL(int datatype){
+    dlinkedlist* head=(dlinkedlist*)malloc(sizeof(dlinkedlist));
     head->length=-1;
-
+    head->next=NULL;
+    head->prev=NULL;
+    head->end=NULL;
     if(datatype==1){
     	head->data=(void*)&dataInt;
     }else if(datatype==2){
-	head->data=(void*)&dataChar; 
+	head->data=(void*)&dataChar;
     }else if(datatype==3){
 	head->data=(void*)&dataFloat;
     }else if(datatype==4){
 	head->data=(void*)&dataString;
     }
-    head->datatype=datatype;
-
-    return head;
+    head->datatype=(short)datatype;
 }
 
+//insert at the head of linked-list
 
-//<------------------------------------------------------->
-
-
-//<----------------------------INSERTION------------------------------->
-
-
-
-//Function for inserting element at head in linked-list
-void insertAtHead(linkedlist* head,void* val){
-    
+void insertAtHeadDLL(dlinkedlist* head, void* val){
     //if element to be added is first element
     if(head->length==-1){
         head->data=val;
@@ -69,13 +47,18 @@ void insertAtHead(linkedlist* head,void* val){
     }
 
     //Initializing memory for new node
-    linkedlist* newNode=(linkedlist*)malloc(sizeof(linkedlist));
+    dlinkedlist* newNode=(dlinkedlist*)malloc(sizeof(dlinkedlist));
 
     //adding Node at start(without changing the head pointer)
     newNode->data=head->data;
     newNode->next=head->next;
+    if(head->next!=NULL){
+    	head->next->prev=newNode;
+    }
     head->data=val;
     head->next=newNode;
+    newNode->prev=head;
+
     if(head->length==1){
 	    head->end=newNode;
     }
@@ -84,42 +67,34 @@ void insertAtHead(linkedlist* head,void* val){
     head->length+=1;
 }
 
-
 //Function for inserting element at tail in linked-list
-void insertAtTail(linkedlist* head,void* n){
+void insertAtTailDLL(dlinkedlist* head,void* val){
 
     //if element is to be added is first Element
     if(head->length==-1){
-    	head->data=n;
+    	head->data=val;
 	head->length=1;
 	head->end=head;
 	return;
     }
 
     //initializing memory for new node
-    linkedlist* newNode=(linkedlist*)malloc(sizeof(linkedlist));
-    newNode->data=n;
+    dlinkedlist* newNode=(dlinkedlist*)malloc(sizeof(dlinkedlist));
+    newNode->data=val;
     newNode->next=NULL;
 
 
     //attaching last node at end
     head->end->next=newNode;
+    newNode->prev=head->end;
     head->end=newNode;
 
     //increasing the length of list;
     head->length+=1;
 }
 
-
-//<--------------------------------------------------------------------->
-
-
-//<----------------------------DELETION--------------------------------->
-
-
-
 //Function to delete Node at the end
-void deleteAtTail(linkedlist* head){
+void deleteAtTailDLL(dlinkedlist* head){
 
     //if linked-list is already empty
     if(head->length==-1){
@@ -129,7 +104,9 @@ void deleteAtTail(linkedlist* head){
 
     //if linked-list has only one element
     if(head->next==NULL){
-        head->length=-1;
+        
+	head->length=-1;
+
 	if(head->datatype==1){
     	    head->data=&dataInt;
 	}else if(head->datatype==2){
@@ -139,19 +116,14 @@ void deleteAtTail(linkedlist* head){
 	}else if(head->datatype==4){
 	    head->data=&dataString;
 	}
+	
 	head->end=NULL;
 	return;
     }
 
-    linkedlist* todelete=head->end;
-    linkedlist* prev=NULL;
-    linkedlist* temp=head;
-    while(temp->next!=NULL){
-    	prev=temp;
-	temp=temp->next;
-    }
-    prev->next=NULL;
-    head->end=prev;
+    dlinkedlist* todelete=head->end;
+    head->end=head->end->prev;
+    head->end->next=NULL;
 
     //free the garbage memory
     free(todelete);
@@ -160,10 +132,9 @@ void deleteAtTail(linkedlist* head){
     head->length-=1;
 }
 
-
 //Function to delete Node at the head, Character type
-void deleteAtHead(linkedlist* head){
-    
+void deleteAtHeadDLL(dlinkedlist* head){
+
     //if linked-list is already empty
     if(head->length==-1){
     	printf("ERROR: Linked-list is empty\n");
@@ -173,6 +144,7 @@ void deleteAtHead(linkedlist* head){
     //if linked-list had only one element
     if(head->next==NULL){
     	head->length=-1;
+
 	if(head->datatype==1){
     	    head->data=&dataInt;
 	}else if(head->datatype==2){
@@ -182,14 +154,18 @@ void deleteAtHead(linkedlist* head){
 	}else if(head->datatype==4){
 	    head->data=&dataString;
 	}
+
 	head->end=NULL;
 	return;
     }
-    
+
     //removing the head without deleting head pointer
     head->data=head->next->data;
-    linkedlist* todelete=head->next;
+    dlinkedlist* todelete=head->next;
     head->next=head->next->next;
+    if(head->next!=NULL){
+    	head->next->prev=head;
+    }
     if(head->length==2){
     	head->end=head;
     }
@@ -201,16 +177,11 @@ void deleteAtHead(linkedlist* head){
     head->length-=1;
 }
 
-
-//<--------------------------------------------------------------------->
-
-
-//<---------------------PRINT-------------------->
-
-
 //Function to print Linked-list
-void printLinkedlist(linkedlist* head){
-    linkedlist* temp=head;
+void printDLL(dlinkedlist* head){
+
+    dlinkedlist* temp=head;
+
     while(temp!=NULL){
 	if(head->datatype==1){
     	    printf("%d ",*(int*)temp->data);
@@ -220,29 +191,24 @@ void printLinkedlist(linkedlist* head){
 	    printf("%f ",*(float*)temp->data);
 	}else if(head->datatype==4){
 	    printf("%s ",(char*)temp->data);
-	}   
+	}
 	temp=temp->next;
     }
     printf("\n");
 }
 
-
-//<---------------------------------------------->
-
-
-
-//Function to return length of Linked-List
-int sizeLinkedlist(linkedlist* head){
+// Function to return size of doubly linked list
+int sizeDLL(dlinkedlist* head){
     return head->length;
 }
 
 
 //<----------FREE THE MEMORY-------------->
 
-void freeMemoryLinkedList(linkedlist* head){
+void freeMemoryDLL(deque* head){
 
     //free the memery
-    linkedlist* next;
+    deque* next;
     while(head!=NULL){
     	next=head->next;
 	free(head);
@@ -253,5 +219,5 @@ void freeMemoryLinkedList(linkedlist* head){
 }
 
 //<--------------------------------------->
-#define linkedListLib
+#define doublyLinkedList
 #endif

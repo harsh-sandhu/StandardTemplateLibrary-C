@@ -169,7 +169,24 @@ int sizeOfStack(stack* head){
      return head->length;
 }
 
-
 //<--------------------------------------------------------->
+
+
+//<----------FREE THE MEMORY-------------->
+
+void freeMemoryStack(stack* head){
+
+    //free the memery
+    stack* next;
+    while(head!=NULL){
+    	next=head->next;
+	free(head);
+	head=next;
+    }
+    free(next);
+
+}
+
+//<--------------------------------------->
 #define stackStandardLib
 #endif

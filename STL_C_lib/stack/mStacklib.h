@@ -317,5 +317,23 @@ int sizeMStack(mstack* head){
 
 
 //<--------------------------------------------------------->
+
+
+//<----------FREE THE MEMORY-------------->
+
+void freeMemoryMStack(mstack* head){
+
+    //free the memery
+    mstack* next;
+    while(head!=NULL){
+    	next=head->next;
+	free(head);
+	head=next;
+    }
+    free(next);
+
+}
+
+//<--------------------------------------->
 #define mStacklib
 #endif
