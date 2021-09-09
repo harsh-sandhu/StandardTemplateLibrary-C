@@ -1,3 +1,4 @@
+#ifndef cstl 
 struct linkedlist{};
 typedef struct linkedlist linkedlist;
 struct dlinkedlist{};
@@ -72,3 +73,39 @@ void enqueueBackArr(deque* head,void* arr[],int n);
 void itovp(int* arr,void* ptr[],int n);
 void ctovp(char* arr,void* ptr[],int n);
 void ftovp(float* arr,void* ptr[],int n);
+struct btree{};
+typedef struct btree btree;
+btree* createNode(short datatype,void* value);
+btree* insertLeft(btree* root, void* value);
+btree* insertRight(btree* root, void* value);
+void inorderTraversal(btree* root);
+void preorderTraversal(btree* root);
+void postorderTraversal(btree* root);
+struct bst{};
+typedef struct bst bst;
+bst* createBSTNode(short datatype,void* item);
+bst* insertInBST(bst* node, void* val , short datatype);
+bst* minValueBST(bst* node);
+bst* deleteFromBST(bst* root, void* val);
+void postorderBST(bst *root);
+void inorderBST(bst *root);
+void preorderBST(bst *root);
+void quick_sort(void** arr,int l,int r,short(*cmp)(void*, void*));
+void merge_sort(void **a,int l,int r, short(*cmp)(void* ,void*));
+void sort(void* arr, int n , short(*cmp)(void*, void*));
+short INTASC(void* a, void* b);
+short INTDESC(void* a, void* b);
+short CHARASC(void* a, void* b);
+short CHARDESC(void* a, void* b);
+short FLOATASC(void* a, void* b);
+short FLOATDESC(void* a, void* b);
+short STRDESC(void* a, void* b);
+short STRASC(void* a, void* b);
+int binarySearch(void* arr, int n, void* ptrkey, short datatype);
+int binarySearchInt(void* arr, int n, int key);
+int binarySearchChar(void* arr, int n, char key);
+int binarySearchFloat(void* arr, int n, float key);
+int binarySearchString(char** arr, int n, char* key);
+int searchArr(void* arr,int n, void* key, short datatype);
+#define cstl
+#endif
